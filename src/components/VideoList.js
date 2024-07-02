@@ -2,15 +2,14 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import io from 'socket.io-client';
 
-const backendURL = process.env.REACT_APP_BACKEND_URL;
-const socket = io(backendURL);
+const socket = io('https://backend-six-wheat.vercel.app/');
 
 const VideoList = () => {
   const [videos, setVideos] = useState([]);
   const [selectedVideo, setSelectedVideo] = useState(null);
 
   useEffect(() => {
-    axios.get(`${backendURL}/api/videos`)
+    axios.get('https://backend-six-wheat.vercel.app/api/videos')
       .then(response => {
         setVideos(response.data);
       })
@@ -25,7 +24,7 @@ const VideoList = () => {
 
   const handleVideoSelect = (video) => {
     setSelectedVideo(video);
-    axios.post(`${backendURL}/api/view`, { videoId: video.videoId, title: video.title })
+    axios.post('https://backend-six-wheat.vercel.app/api/view', { videoId: video.videoId, title: video.title })
       .catch(error => {
         console.error('Error reporting video view:', error);
       });

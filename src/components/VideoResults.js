@@ -1,3 +1,4 @@
+// components/VideoResults.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import io from 'socket.io-client';
@@ -6,15 +7,14 @@ import { Chart, registerables } from 'chart.js';
 
 Chart.register(...registerables);
 
-const backendURL = process.env.REACT_APP_BACKEND_URL;
-const socket = io(backendURL);
+const socket = io('https://backend-six-wheat.vercel.app/');
 
 const VideoResults = () => {
   const [videoViews, setVideoViews] = useState([]);
 
   useEffect(() => {
     // Solicitar los datos actuales de los videos al montar el componente
-    axios.get(`${backendURL}/api/videoViews`)
+    axios.get('https://backend-six-wheat.vercel.app/api/videoViews')
       .then(response => {
         setVideoViews(response.data);
       })
