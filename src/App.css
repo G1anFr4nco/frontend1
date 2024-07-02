@@ -1,0 +1,44 @@
+.App {
+  text-align: center;
+}
+
+nav {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+nav a {
+  margin: 0 10px;
+  text-decoration: none;
+  color: #007bff;
+}
+
+nav a:hover {
+  text-decoration: underline;
+}
+
+.video-list, .video-views {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.video-list div, .video-views div {
+  margin: 10px 0;
+}
+
+.video-list img {
+  cursor: pointer;
+  max-width: 100%;
+  height: auto;
+}
+
+.video-player {
+  margin-top: 20px;
+}
+
+.video-player iframe {
+  width: 560px;
+  height: 315px;
+}
