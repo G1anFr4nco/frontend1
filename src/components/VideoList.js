@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import io from 'socket.io-client';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const socket = io('https://backend-six-wheat.vercel.app/');
 
@@ -32,21 +33,29 @@ const VideoList = () => {
 
   return (
     <div className="video-list">
-      <h1>Video Player</h1>
-      {videos.map(video => (
-        <div key={video.videoId} onClick={() => handleVideoSelect(video)}>
-          <img src={video.thumbnail} alt={video.title} />
-          <h3>{video.title}</h3>
-        </div>
-      ))}
+      <h1 className="text-center mb-4">Algunos de nuestros trabajos</h1>
+      <div className="row">
+        {videos.map(video => (
+          <div key={video.videoId} className="col-md-4 mb-4" onClick={() => handleVideoSelect(video)}>
+            <div className="card">
+              <img src={video.thumbnail} className="card-img-top" alt={video.title} />
+              <div className="card-body">
+                <h5 className="card-title">{video.title}</h5>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
       {selectedVideo && (
-        <div className="video-player">
+        <div className="video-player mt-4">
           <iframe
             src={`https://www.youtube.com/embed/${selectedVideo.videoId}`}
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
             title={selectedVideo.title}
+            className="w-100"
+            style={{ height: '500px' }}
           />
         </div>
       )}

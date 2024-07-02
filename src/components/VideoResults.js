@@ -1,19 +1,20 @@
-// components/VideoResults.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import io from 'socket.io-client';
 import { Bar } from 'react-chartjs-2';
 import { Chart, registerables } from 'chart.js';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 Chart.register(...registerables);
 
-const socket = io('https://backend-six-wheat.vercel.app/');
+const socket = io('https://backend-six-wheat.vercel.app/', { transports: ['websocket', 'polling', 'flashsocket'] });
 
 const VideoResults = () => {
   const [videoViews, setVideoViews] = useState([]);
 
   useEffect(() => {
-    // Solicitar los datos actuales de los videos al montar el componente
     axios.get('https://backend-six-wheat.vercel.app/api/videoViews')
       .then(response => {
         setVideoViews(response.data);
@@ -22,7 +23,6 @@ const VideoResults = () => {
         console.error('Error fetching video views:', error);
       });
 
-    // Actualizar la lista de vistas de los videos cuando se recibe un evento de socket
     socket.on('videoViewed', (data) => {
       setVideoViews((prevViews) => {
         const index = prevViews.findIndex(v => v.videoId === data.videoId);
@@ -36,13 +36,24 @@ const VideoResults = () => {
       });
     });
 
-    // Limpiar el socket al desmontar el componente
     return () => {
       socket.off('videoViewed');
     };
   }, []);
 
-  // Prepara los datos para el gráfico de barras
+  const generatePDF = () => {
+    const doc = new jsPDF();
+    doc.text("Top 20 Most Viewed Videos", 14, 20);
+    const tableColumn = ["Title", "Views"];
+    const tableRows = [];
+    videoViews.sort((a, b) => b.views - a.views).slice(0, 20).forEach(video => {
+      const videoData = [video.title, video.views];
+      tableRows.push(videoData);
+    });
+    doc.autoTable(tableColumn, tableRows, { startY: 30 });
+    doc.save('video_views.pdf');
+  };
+
   const data = {
     labels: videoViews.map(video => video.title),
     datasets: [
@@ -57,7 +68,7 @@ const VideoResults = () => {
   };
 
   const options = {
-    indexAxis: 'y', // Para un gráfico de barras horizontal
+    indexAxis: 'y',
     scales: {
       x: {
         beginAtZero: true,
@@ -81,14 +92,25 @@ const VideoResults = () => {
   };
 
   return (
-    <div className="video-views">
-      <h2>Video Views</h2>
-      <Bar data={data} options={options} />
-      {videoViews.sort((a, b) => b.views - a.views).slice(0, 10).map(video => (
-        <div key={video.videoId}>
-          <h3>{video.title} - {video.views} views</h3>
+    <div className="video-views container">
+      <h2 className="my-4">ANÁLISIS DE VISTAS</h2>
+      
+        <Bar data={data} options={options} />
+      
+      <div className="mb-4">
+        <h3 className="mb-3">Top 20 Videos Más Vistos</h3>
+        <div className="list-group">
+          {videoViews.sort((a, b) => b.views - a.views).slice(0, 20).map((video, index) => (
+            <div key={video.videoId} className="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+              <div>
+                <h5 className="mb-1">{index + 1}. {video.title}</h5>
+              </div>
+              <span className="badge bg-primary rounded-pill">{video.views} views</span>
+            </div>
+          ))}
         </div>
-      ))}
+      </div>
+      <button className="btn btn-primary mt-3" onClick={generatePDF}>Generar PDF</button>
     </div>
   );
 };
